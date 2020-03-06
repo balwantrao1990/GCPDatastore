@@ -34,7 +34,7 @@ const query = datastore
 return datastore.runQuery(query);
  };
 
-app.get('/', async(_req,res,next)=>{
+/*app.get('/customer', async(_req,res,next)=>{
     //Return the record to the API
 try {
     const [entities] = await getRecord();
@@ -43,38 +43,71 @@ try {
     );
     res
       .status(200)
-      .set('Content-Type', 'text/plain')
+      .set('Content-Type', 'application/json')
       .send(records.toString())
       .end();
   } catch (error) {
     next(error);
   }
-});
-/*
-app.get('/', async(req,res,next)=>{
+});*/
+/*app.get('/customer/:id', (req, res, next)=>{
+    const id1 = req.query.id;
+    console.log(id1);
+const fullProfile = {
+  //sql: 'select * from Customer where ID= '111''
+};
+let arr = datastore.runQuery(fullProfile)
+callback(arr);
+res.status(200).send('user' + req.params.id);
+
+}); */
+
+app.get('/customer', async(req,res,next)=>{
 try{
     const idval = req.query.id;
+    console.log(idval);
     const getIdRecord = () => {
         const query = datastore
         .createQuery('Customer')
-        .select(['Name', 'Contact'])
-        .filter('ID','=', idval);
+        //.select(['Name', 'Contact'])
+        .filter('ID', '=', idval);
         return datastore.runQuery(query);
     };
-    const [entities] = getIdRecord();
-    const records = entities.map(
-      entity => `ID: ${entity.ID}, Name: ${entity.Contact}, Contact: ${entity.Name} `
-    );
-    res
+    if(typeof req.query.id != 'undefined'){
+    const [entities] = await getIdRecord();
+     res
     .status(200)
-    .set('Content-Type', 'text/plain')
-    .send(records.toString())
-    .end();  
+    .set('Content-Type', 'application/json')
+    .send(entities)
+    .end(); 
+    }
+    else
+    {
+        const [entities] = await getRecord();
+        const records = entities.map(
+         entity => `ID: ${entity.ID}, Name: ${entity.Name} `
+         
+    );
+      res
+      .status(200)
+      .set('Content-Type', 'application/json')
+      .send(records.toString())
+      .end();
+
+    }
+    //console.log(entities);
+    //const records = entities.map(
+     // const records = entities.entity => `ID: ${entity.ID}, Name: ${entity.Contact}, Contact: ${entity.Name} `
+    //);
+   
+    
+       
+    
 }catch (error) {
     next(error);
   }
 });
-*/
+
 const PORT = process.env.PORT || 8080;
 app.listen(process.env.PORT || 8080, () => {
   console.log(`App listening on port ${PORT}`);
